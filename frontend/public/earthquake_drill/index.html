@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Duck, Cover & Hold Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #ff5722;
+            --primary-dark: #e64a19;
+            --secondary: #2196f3;
+            --secondary-dark: #1976d2;
+            --dark: #121212;
+            --dark-accent: #1e1e2f;
+            --light: #f5f5f5;
+            --success: #4caf50;
+            --success-dark: #388e3c;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --danger-dark: #d32f2f;
+            --light-gray: #eeeeee;
+            --dark-gray: #757575;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--dark-accent) 100%);
+            color: var(--light);
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(33, 150, 243, 0.1) 0%, rgba(0, 0, 0, 0) 70%), 
+                      radial-gradient(circle at top right, rgba(255, 87, 34, 0.1) 0%, rgba(0, 0, 0, 0) 70%);
+            opacity: 0.8;
+            z-index: -1;
+        }
+        
+        body::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(45deg, rgba(0, 0, 0, 0.2) 25%, transparent 25%), 
+                linear-gradient(-45deg, rgba(0, 0, 0, 0.2) 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, rgba(0, 0, 0, 0.2) 75%), 
+                linear-gradient(-45deg, transparent 75%, rgba(0, 0, 0, 0.2) 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            opacity: 0.05;
+            z-index: -1;
+        }
+
+        .header {
+            padding: 20px;
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--light);
+            text-shadow: 0 2px 15px rgba(255, 87, 34, 0.5);
+            position: relative;
+            display: inline-block;
+            font-family: 'Montserrat', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 3px;
+            box-shadow: 0 2px 10px rgba(255, 87, 34, 0.4);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            margin: 15px 0 25px;
+            color: var(--secondary);
+            font-weight: 400;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        #game-container {
+            margin: 0 auto;
+            display: block;
+            width: 900px;
+            height: 600px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 87, 34, 0.3);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        #game-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 25px rgba(255, 87, 34, 0.4);
+        }
+
+        #ui {
+            margin-top: 25px;
+            padding: 25px;
+            background: rgba(30, 30, 47, 0.85);
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 15px rgba(33, 150, 243, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 100%;
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+        }
+
+        #start-btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255, 87, 34, 0.5);
+            font-family: 'Poppins', sans-serif;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        #start-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: all 0.6s ease;
+            z-index: -1;
+        }
+
+        #start-btn:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(255, 87, 34, 0.7);
+        }
+
+        #start-btn:hover::before {
+            left: 100%;
+        }
+
+        #start-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.5);
+        }
+
+        #start-btn:disabled {
+            background: linear-gradient(135deg, #999 0%, #777 100%);
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.7;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 1.3rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px 25px;
+            border-radius: 50px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #time-val {
+            font-weight: 700;
+            color: var(--light);
+            background: rgba(33, 150, 243, 0.3);
+            padding: 8px 20px;
+            border-radius: 20px;
+            min-width: 70px;
+            display: inline-block;
+            box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #time-val::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 80%);
+            z-index: -1;
+        }
+
+        #result {
+            margin-top: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 15px 30px;
+            border-radius: 12px;
+            transition: all 0.5s ease;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(76, 175, 80, 0.1) 100%);
+            color: var(--success);
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .failure {
+            background: linear-gradient(135deg, rgba(244, 67, 54, 0.2) 0%, rgba(244, 67, 54, 0.1) 100%);
+            color: var(--danger);
+            border: 1px solid rgba(244, 67, 54, 0.3);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.2);
+        }
+        
+        .result-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .result-title {
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'Montserrat', sans-serif;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+        
+        .result-message {
+            font-size: 18px;
+            line-height: 1.5;
+            max-width: 600px;
+        }
+        
+        .result-health {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .health-bar-container {
+            width: 200px;
+            height: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .health-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 1s ease-out;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            text-align: left;
+            max-width: 900px;
+        }
+
+        .instructions h3 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 5px;
+        }
+
+        .key-control {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+        
+        .game-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .intro-content {
+            max-width: 80%;
+            padding: 30px;
+            background: rgba(30, 30, 47, 0.9);
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateY(0);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .intro-icon {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .intro-content h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 800;
+            font-size: 28px;
+            margin-bottom: 15px;
+            color: var(--light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .intro-content p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            color: var(--light);
+        }
+        
+        .controls-info {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .key-icon {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            color: var(--light);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .earthquake-shake {
+            animation: earthquake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+            animation-iteration-count: 5;
+        }
+        
+        @keyframes earthquake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            10%, 30%, 50%, 70%, 90% {
+                transform: translateX(-5px);
+            }
+            20%, 40%, 60%, 80% {
+                transform: translateX(5px);
+            }
+        }
+        
+        @media (max-width: 950px) {
+            #game-container {
+                width: 100%;
+                height: auto;
+                aspect-ratio: 3/2;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .intro-content h2 {
+                font-size: 22px;
+            }
+            
+            .intro-content p {
+                font-size: 14px;
+            }
+            
+            .controls-info {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-exclamation-triangle"></i> Duck, Cover & Hold <i class="fas fa-exclamation-triangle"></i></h1>
+            <p class="subtitle">Learn earthquake safety through this interactive drill simulation</p>
+        </div>
+
+        <div id="game-container">
+            <div class="game-overlay" id="game-intro">
+                <div class="intro-content">
+                    <div class="intro-icon"><i class="fas fa-house-damage fa-bounce"></i></div>
+                    <h2>Earthquake Drill Simulation</h2>
+                    <p>This simulation will test your earthquake safety knowledge. Bricks will fall from the ceiling. Your goal is to take cover under the desk to protect yourself.</p>
+                    <div class="controls-info">
+                        <div class="control-item">
+                            <div class="key-icon">←→↑↓</div>
+                            <span>Move left/right/up/down</span>
+                        </div>
+                        <div class="control-item">
+                            <div class="key-icon">Shift+Spacebar</div>
+                            <span>Duck under desk</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="ui">
+            <button id="start-btn">Start Earthquake Drill</button>
+            <div class="timer-container">
+                <i class="fas fa-clock"></i>
+                <span>Time remaining:</span>
+                <span id="time-val">--</span>
+                <span>seconds</span>
+            </div>
+            <div id="result"></div>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li>Use <span class="key-control">←</span> <span class="key-control">→</span> <span class="key-control">↑</span> <span class="key-control">↓</span>arrow keys to move</li>
+                <li>Press <span class="key-control">Shift</span> to duck under a desk</li>
+                <li>Hold <span class="key-control">Space</span> to grab and hold onto the desk</li>
+                <li>Remember: Duck, Cover, and Hold to stay safe during an earthquake!</li>
+                <li>Avoid falling objects to maintain your health</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Load Phaser 3 -->
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
+    <!-- Load game code -->
+    <script src="game.js"></script>
+    <script>
+        // Handle game intro and result display enhancements
+        window.addEventListener('DOMContentLoaded', () => {
+            const gameIntro = document.getElementById('game-intro');
+            const startBtn = document.getElementById('start-btn');
+            
+            // Prevent scrolling when Shift+Spacebar is pressed
+            window.addEventListener('keydown', (event) => {
+                // Check if both Shift and Spacebar are pressed
+                if (event.key === ' ' && event.shiftKey) {
+                    // Prevent the default scrolling behavior
+                    event.preventDefault();
+                }
+                // Also prevent scrolling for just spacebar during gameplay
+                if (event.key === ' ' && !gameIntro.classList.contains('hidden')) {
+                    event.preventDefault();
+                }
+            });
+            
+            // Handle start button click to hide intro and start game
+            startBtn.addEventListener('click', () => {
+                if (gameIntro) {
+                    gameIntro.classList.add('hidden');
+                    
+                    // Disable the button to prevent multiple clicks
+                    startBtn.disabled = true;
+                    
+                    // Start the game by transitioning to PlayScene
+                    // Access the game variable from the global scope
+                    console.log('Game object:', window.game);
+                    if (window.game && window.game.scene) {
+                        console.log('Starting PlayScene');
+                        window.game.scene.start('PlayScene');
+                    } else {
+                        console.error('Game or game.scene is not available');
+                    }
+                    
+                    // Add shake animation to game container when earthquake starts
+                    setTimeout(() => {
+                        const gameContainer = document.getElementById('game-container');
+                        gameContainer.classList.add('earthquake-shake');
+                        
+                        // Remove shake after the game fully starts
+                        setTimeout(() => {
+                            gameContainer.classList.remove('earthquake-shake');
+                        }, 2000);
+                    }, 500);
+                }
+            });
+            
+            
+            // Override the ResultScene's create method to enhance the result display
+            const originalCreate = ResultScene.prototype.create;
+            ResultScene.prototype.create = function() {
+                // Call the original create method first
+                originalCreate.call(this);
+                
+                // Get the result div and enhance it
+                const resultDiv = document.getElementById('result');
+                const startBtn = document.getElementById('start-btn');
+                const isSafe = this.registry.get('result') === 'safe';
+                const health = this.registry.get('health');
+                
+                // Show intro again when game ends
+                if (gameIntro) {
+                    gameIntro.classList.remove('hidden');
+                }
+                
+                // Clear previous content
+                resultDiv.innerHTML = '';
+                
+                // Create enhanced result content
+                const icon = document.createElement('div');
+                icon.className = 'result-icon';
+                icon.innerHTML = isSafe ? '<i class="fas fa-shield-alt"></i>' : '<i class="fas fa-exclamation-triangle"></i>';
+                
+                const title = document.createElement('div');
+                title.className = 'result-title';
+                title.textContent = isSafe ? 'SAFETY ACHIEVED!' : 'INJURED!';
+                
+                const message = document.createElement('div');
+                message.className = 'result-message';
+                message.textContent = isSafe ? 
+                    'Congratulations! You successfully protected yourself during the earthquake drill.' : 
+                    'You were hit by falling objects. Remember to take cover under sturdy furniture during an earthquake.';
+                
+                const healthDisplay = document.createElement('div');
+                healthDisplay.className = 'result-health';
+                healthDisplay.innerHTML = `Health: <div class="health-bar-container"><div class="health-bar-fill" style="width: ${health}%; background: ${health > 50 ? 'var(--success)' : 'var(--danger)'}"></div></div> ${health}%`;
+                
+                // Append all elements
+                resultDiv.appendChild(icon);
+                resultDiv.appendChild(title);
+                resultDiv.appendChild(message);
+                resultDiv.appendChild(healthDisplay);
+                
+                // Enhance start button text
+                startBtn.textContent = 'Try Again';
+                
+                // Add special effects for result display
+                resultDiv.style.display = 'flex';
+                setTimeout(() => {
+                    resultDiv.classList.add('result-appear');
+                }, 100);
+            };
+        });
+    </script>
+</body>
+
+</html>
