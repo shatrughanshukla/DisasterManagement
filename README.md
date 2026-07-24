@@ -73,7 +73,7 @@ Contributions are welcome!
 - Want to add a new drill/game? 🎮  
 - Have an optimization? ⚡  
 
-Feel free to Submit a **Pull Request**, open a **Discussion** or connect with me at **[LinkedIn](https://www.linkedin.com/in/shivanshranadtu/)**
+Feel free to Submit a **Pull Request**, open a **Discussion** or connect with me at **[LinkedIn](https://www.linkedin.com/in/shatrughan-shukla-0ba2692a7/)**
 
 
 <p align="center"> ✨ *Preparedness Saves Lives* ✨ </p>
