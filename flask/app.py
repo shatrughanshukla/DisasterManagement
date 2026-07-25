@@ -17,7 +17,7 @@ if not api_key:
     raise ValueError("No GEMINI_API_KEY found in environment variables")
 
 # Gemini API endpoint
-GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
+GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key={api_key}"
 
 @app.route('/')
 def index():

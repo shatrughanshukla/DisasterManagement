@@ -42,9 +42,9 @@ function centerFromCircle(circleStr=''){
   const lat = parseFloat(m[1]), lon = parseFloat(m[2]);
   return (Number.isFinite(lat) && Number.isFinite(lon)) ? [lon, lat] : null;
 }
-function buildXmlUrl(identifier){
+function buildXmlUrl(identifier) {
   if (!identifier) return null;
-  // Use the FULL identifier (keep the IN- prefix)
+
   return `https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=${encodeURIComponent(identifier)}`;
 }
 async function fetchWithTimeout(url, ms=4000){
@@ -80,46 +80,56 @@ function looksEnglish(text = '') {
  * - ALWAYS overrides severity & location from XML (so no "Unknown")
  */
 export async function getNdmaCapAlerts(limit = 5){
-  const rssUrl = process.env.NDMA_CAP_RSS;
-  if (!rssUrl) throw new Error('NDMA_CAP_RSS not set');
+  const res = await fetch(
+    "https://sachet.ndma.gov.in/cap_public_website/FetchAllAlertDetails",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      next: { revalidate: 60 },
+    },
+  );
 
-  const res = await fetch(rssUrl, { next: { revalidate: 60 } });
-  if (!res.ok) throw new Error(`NDMA RSS failed: ${res.status}`);
+  if (!res.ok) {
+    throw new Error(`NDMA API failed: ${res.status}`);
+  }
 
-  const xml = await res.text();
-  const j = parser.parse(xml);
-  const items = asArray(j?.rss?.channel?.item);
+  const alerts = await res.json();
 
-  const base = items.map(i => {
-    const identifier = pickText(i['cap:identifier']) || pickText(i.guid);
-    const sent = pickText(i['cap:sent']) || pickText(i.pubDate) || null;
+  const base = alerts.map((alert) => {
+    const identifier = String(alert.identifier);
+    const sentRaw = alert.effective_start_time;
+    const sentDate = sentRaw ? new Date(sentRaw) : null;
+    const sent = sentDate && !isNaN(sentDate.getTime()) ? sentRaw : null;
 
-    // Try coordinates if present in RSS (rare)
     let coords = null;
-    const poly = pickText(i['cap:polygon']) || pickText(i['cap:area']?.['cap:polygon']);
-    const circle = pickText(i['cap:circle']) || pickText(i['cap:area']?.['cap:circle']);
-    if (poly) coords = centroidFromPolygon(poly);
-    if (!coords && circle) coords = centerFromCircle(circle);
+
+    if (alert.centroid) {
+      const [lon, lat] = alert.centroid.split(",").map(Number);
+
+      if (Number.isFinite(lat) && Number.isFinite(lon)) {
+        coords = [lon, lat];
+      }
+    }
 
     const xmlUrl = buildXmlUrl(identifier);
-    const humanUrl = pickText(i.link) || null;
 
-    // React-safe unique key
-    const uid = shortId(`${identifier || ''}|${sent || ''}`);
+    const uid = shortId(`${identifier}|${sent || ""}`);
 
     return {
-      kind: 'cap',
-      uid,                          // Use this in React keys
-      id: identifier || uid,
-      identifier: identifier || null,
-      title: pickText(i.title) || 'Alert', // will be replaced by English headline from XML
-      time: sent ? new Date(sent).toISOString() : null,
-      location: '—',                // will be filled from XML
-      severity: 'Unknown',          // will be overridden by XML
-      link: humanUrl || xmlUrl,     // keep something clickable
+      kind: "cap",
+      uid,
+      id: identifier,
+      identifier,
+      title: alert.disaster_type || "Alert",
+      time: sent ? new Date(sent).toISOString() : null, // sent is now pre-validated above
+      location: alert.area_description || "—",
+      severity: alert.severity || "Unknown",
+      link: xmlUrl,
       xmlUrl,
       coords,
-      event: '',
+      event: alert.disaster_type || "",
     };
   });
 

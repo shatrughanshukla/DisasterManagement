@@ -1,14 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Fix workspace root warning
+  distDir: "dist",
+
   turbopack: {
-    root: "C:\\Users\\Shivansh Rana\\Desktop\\DTU Academic\\Codes\\WEBD\\SIH25008\\frontend"
+    root: process.cwd(),
   },
-  
-  // Set output directory
-  distDir: 'dist',
-  
-  // API rewrites
+
   async rewrites() {
     return [
       {
@@ -20,3 +17,43 @@ const nextConfig = {
 };
 
 export default nextConfig;
+
+// import path from "path";
+
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//   distDir: "dist",
+
+//   turbopack: {
+//     root: path.resolve(__dirname),
+//   },
+
+//   async rewrites() {
+//     return [
+//       {
+//         source: "/api/:path*",
+//         destination: "http://localhost:5000/api/:path*",
+//       },
+//     ];
+//   },
+// };
+
+// export default nextConfig;
+
+// /** @type {import('next').NextConfig} */
+// const nextConfig = {
+//   // Set output directory
+//   distDir: 'dist',
+
+//   // API rewrites
+//   async rewrites() {
+//     return [
+//       {
+//         source: "/api/:path*",
+//         destination: "http://localhost:5000/api/:path*",
+//       },
+//     ];
+//   },
+// };
+
+// export default nextConfig;
