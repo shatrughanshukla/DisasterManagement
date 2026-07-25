@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { FaBook, FaCalendarAlt, FaClipboardList, FaBell, FaUserCircle } from 'react-icons/fa';
-import { FaHouseDamage, FaFire, FaWater, FaArrowRight } from 'react-icons/fa';
+import { FaHouseDamage, FaFire, FaWater, FaArrowRight, FaMapMarkerAlt } from 'react-icons/fa';
 import AuthDiagnosticTool from '@/app/components/AuthDiagnosticTool';
 import Link from 'next/link';
 import AlertTicker from '@/app/components/AlertTicker';
@@ -145,6 +145,31 @@ useEffect(() => {
             <h2 className="font-display text-sm mb-2 uppercase tracking-wide" style={{ color: '#1E3A5F' }}>Alerts</h2>
             <AlertTicker />
           </div>
+
+          {/* Nearby shelters & hospitals quick-access card */}
+          <Link
+            href="/dashboard/student/nearby"
+            className="flex items-center justify-between gap-4 rounded-xl p-4 sm:p-5 border-2 transition-colors hover:bg-white"
+            style={{ borderColor: '#E8E2CF', background: '#FFFFFF' }}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center flex-none"
+                style={{ background: '#F4C430' }}
+              >
+                <FaMapMarkerAlt style={{ color: '#1E3A5F' }} size={20} aria-hidden="true" />
+              </div>
+              <div>
+                <h3 className="font-display text-sm sm:text-base" style={{ color: '#1E3A5F' }}>
+                  Find nearby shelters &amp; hospitals
+                </h3>
+                <p className="text-xs sm:text-sm mt-0.5" style={{ color: '#5A6B7A' }}>
+                  Hospitals, police, fire stations, and evacuation points near you
+                </p>
+              </div>
+            </div>
+            <FaArrowRight style={{ color: '#B5372F' }} className="flex-none" aria-hidden="true" />
+          </Link>
 
           {/* Module cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
