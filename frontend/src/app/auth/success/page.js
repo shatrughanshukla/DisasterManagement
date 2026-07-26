@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useToast } from '@/app/context/ToastContext';
 import { useAuth } from '@/app/context/AuthContext';
 
-export default function AuthSuccess() {
+function AuthSuccessInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -203,5 +203,17 @@ export default function AuthSuccess() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthSuccess() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    }>
+      <AuthSuccessInner />
+    </Suspense>
   );
 }
