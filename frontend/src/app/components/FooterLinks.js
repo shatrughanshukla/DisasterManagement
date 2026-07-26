@@ -1,31 +1,69 @@
-'use client';
+"use client";
 
-import { useAuth } from '../context/AuthContext';
+import Link from "next/link";
+import { useAuth } from "../context/AuthContext";
 
 export default function FooterLinks() {
   const { user } = useAuth();
-  
+
   return (
     <ul className="space-y-2">
-      <li><a href="/" className="text-gray-400 hover:text-white transition-colors">Home</a></li>
+      <li>
+        <Link
+          href="/"
+          className="text-gray-400 hover:text-white transition-colors"
+        >
+          Home
+        </Link>
+      </li>
+
       {user ? (
-        // Show profile and dashboard links for logged in users
         <>
-          <li><a href="/profile" className="text-gray-400 hover:text-white transition-colors">Profile</a></li>
+          {/* Profile */}
           <li>
-            <a 
-              href={user.role === 'student' ? '/dashboard/student' : '/dashboard/teacher'} 
+            <Link
+              href="/profile"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              Profile
+            </Link>
+          </li>
+
+          {/* Dashboard */}
+          <li>
+            <Link
+              href={
+                user.role === "student"
+                  ? "/dashboard/student"
+                  : "/dashboard/teacher"
+              }
               className="text-gray-400 hover:text-white transition-colors"
             >
               Dashboard
-            </a>
+            </Link>
           </li>
         </>
       ) : (
-        // Show login and register links for guests
         <>
-          <li><a href="/login" className="text-gray-400 hover:text-white transition-colors">Login</a></li>
-          <li><a href="/register" className="text-gray-400 hover:text-white transition-colors">Register</a></li>
+          {/* Login */}
+          <li>
+            <Link
+              href="/login"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              Login
+            </Link>
+          </li>
+
+          {/* Register */}
+          <li>
+            <Link
+              href="/register"
+              className="text-gray-400 hover:text-white transition-colors"
+            >
+              Register
+            </Link>
+          </li>
         </>
       )}
     </ul>

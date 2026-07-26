@@ -218,33 +218,41 @@ useEffect(() => {
           <div className="w-full md:w-64 bg-white rounded-lg shadow-md p-4">
             <div className="flex items-center justify-center flex-col mb-6 pt-2">
               {user?.profilePic ? (
-                <img 
-                  src={user.profilePic} 
-                  alt="Profile" 
-                  className="w-16 h-16 rounded-full object-cover mb-2" 
+                <img
+                  src={user.profilePic}
+                  alt="Profile"
+                  className="w-16 h-16 rounded-full object-cover mb-2"
                 />
               ) : (
-                <img 
-                  src="/uploads/default.png" 
-                  alt="Default Profile" 
-                  className="w-16 h-16 rounded-full object-cover mb-2" 
+                <img
+                  src="/uploads/default.png"
+                  alt="Default Profile"
+                  className="w-16 h-16 rounded-full object-cover mb-2"
                 />
               )}
-              <h2 className="text-xl font-bold text-gray-800">{user?.name || 'Loading...'}</h2>
-              <p className="text-sm text-gray-500">{user?.email || 'teacher@example.com'}</p>
+              <h2 className="text-xl font-bold text-gray-800">
+                {user?.name || "Loading..."}
+              </h2>
+              <p className="text-sm text-gray-500">
+                {user?.email || "teacher@example.com"}
+              </p>
             </div>
-            
+
             <nav className="space-y-1">
               {[
-                { name: 'Overview', id: 'overview', icon: FaChalkboardTeacher },
-                { name: 'My Courses', id: 'courses', icon: FaBook },
-                { name: 'Students', id: 'students', icon: FaUsers },
-                { name: 'Assignments', id: 'assignments', icon: FaClipboardList },
+                { name: "Overview", id: "overview", icon: FaChalkboardTeacher },
+                { name: "My Courses", id: "courses", icon: FaBook },
+                { name: "Students", id: "students", icon: FaUsers },
+                {
+                  name: "Assignments",
+                  id: "assignments",
+                  icon: FaClipboardList,
+                },
               ].map((item) => (
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(item.id)}
-                  className={`flex items-center w-full px-4 py-3 text-left rounded-md transition-colors ${activeTab === item.id ? 'bg-indigo-100 text-indigo-700' : 'hover:bg-gray-100 text-gray-700'}`}
+                  className={`flex items-center w-full px-4 py-3 text-left rounded-md transition-colors ${activeTab === item.id ? "bg-indigo-100 text-indigo-700" : "hover:bg-gray-100 text-gray-700"}`}
                 >
                   <item.icon className="mr-3" />
                   <span className="font-medium">{item.name}</span>
@@ -253,37 +261,53 @@ useEffect(() => {
               {/* Profile and Logout */}
               <div className="pt-4 mt-4 border-t border-gray-200">
                 <button
-                  onClick={() => router.push('/profile')}
+                  onClick={() => router.push("/profile")}
                   className="flex items-center w-full px-4 py-3 text-left rounded-md hover:bg-gray-100 text-gray-700 transition-colors"
                 >
                   <FaUserTie className="mr-3 text-indigo-500" />
                   <span className="font-medium">My Profile</span>
                 </button>
-                
+
                 <button
                   onClick={logout}
                   className="flex items-center w-full px-4 py-3 text-left rounded-md hover:bg-red-50 text-red-600 transition-colors mt-2"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-3"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
                   </svg>
                   <span className="font-medium">Logout</span>
                 </button>
               </div>
             </nav>
           </div>
-          
+
           {/* Main Content */}
           <div className="flex-1">
             <div className="bg-white rounded-lg shadow-md p-4 mb-6">
-              <h1 className="text-2xl font-bold text-gray-800">Teacher Dashboard</h1>
-              <p className="text-gray-700">Welcome back, {user?.name || 'Teacher'}! Here's your disaster management teaching overview.</p>
+              <h1 className="text-2xl font-bold text-gray-800">
+                Teacher Dashboard
+              </h1>
+              <p className="text-gray-700">
+                Welcome back, {user?.name || "Teacher"}! Here&apos;s your
+                disaster management teaching overview
+              </p>
             </div>
             {renderTabContent()}
           </div>
         </div>
       </div>
-      
+
       {/* Add the diagnostic tool for debugging authentication issues */}
       <AuthDiagnosticTool />
     </div>
