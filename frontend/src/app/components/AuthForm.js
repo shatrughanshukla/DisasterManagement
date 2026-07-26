@@ -54,7 +54,9 @@ export default function AuthForm({ type }) {
       
       try {
         setCheckingUsername(true);
-        const response = await fetch(`/api/auth/check-username/${username}`);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/check-username/${username}`,
+        );
         const data = await response.json();
         
         setUsernameAvailable(data.available);
@@ -80,7 +82,9 @@ export default function AuthForm({ type }) {
       
       try {
         setCheckingEmail(true);
-        const response = await fetch(`/api/auth/check-email/${email}`);
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/check-email/${email}`,
+        );
         const data = await response.json();
         
         setEmailAvailable(data.available);
@@ -166,15 +170,17 @@ export default function AuthForm({ type }) {
     <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 space-y-6">
       <div className="text-center">
         <h2 className="text-3xl font-extrabold text-gray-800 mb-2">
-          {type === 'login' ? 'Sign in to your account' : 'Create your account'}
+          {type === "login" ? "Sign in to your account" : "Create your account"}
         </h2>
         <p className="text-sm text-gray-700">
-          {type === 'login' ? 'Enter your credentials to access your account' : 'Fill in the information to get started'}
+          {type === "login"
+            ? "Enter your credentials to access your account"
+            : "Fill in the information to get started"}
         </p>
       </div>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
-        {type === 'register' && (
+        {type === "register" && (
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FaUser className="h-5 w-5 text-gray-400" />
@@ -191,8 +197,8 @@ export default function AuthForm({ type }) {
             />
           </div>
         )}
-        
-        {type === 'register' && (
+
+        {type === "register" && (
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FaUser className="h-5 w-5 text-gray-400" />
@@ -203,7 +209,7 @@ export default function AuthForm({ type }) {
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={`text-black w-full pl-10 pr-10 py-3 border ${usernameError ? 'border-red-500' : usernameAvailable ? 'border-green-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              className={`text-black w-full pl-10 pr-10 py-3 border ${usernameError ? "border-red-500" : usernameAvailable ? "border-green-500" : "border-gray-300"} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
               required
               suppressHydrationWarning
             />
@@ -221,19 +227,18 @@ export default function AuthForm({ type }) {
             )}
           </div>
         )}
-        
+
         <div className="relative">
           <div className="text-black absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FaEnvelope className="h-5 w-5 text-gray-400" />
           </div>
           <input
             id={emailId}
-
             type="email"
             placeholder="Email Address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`text-black w-full pl-10 pr-10 py-3 border ${emailError ? 'border-red-500' : emailAvailable ? 'border-green-500' : 'border-gray-300'} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            className={`text-black w-full pl-10 pr-10 py-3 border ${emailError ? "border-red-500" : emailAvailable ? "border-green-500" : "border-gray-300"} rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             required
             suppressHydrationWarning
           />
@@ -246,37 +251,42 @@ export default function AuthForm({ type }) {
               <FaTimes className="h-5 w-5 text-red-500" />
             ) : null}
           </div>
-          {emailError && type === 'register' && (
+          {emailError && type === "register" && (
             <p className="mt-1 text-sm text-red-600">{emailError}</p>
           )}
         </div>
-        
+
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
             <FaLock className="h-5 w-5 text-gray-400" />
           </div>
           <input
-              id={passwordId}
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="text-black w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              required
-              suppressHydrationWarning
-            />
+            id={passwordId}
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="text-black w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            required
+            suppressHydrationWarning
+          />
         </div>
-        
-        {type === 'register' && (
+
+        {type === "register" && (
           <div className="space-y-3">
             <div className="mb-2">
-              <label htmlFor={profilePicId} className="block text-gray-700 text-sm font-medium mb-2">Profile Picture</label>
+              <label
+                htmlFor={profilePicId}
+                className="block text-gray-700 text-sm font-medium mb-2"
+              >
+                Profile Picture
+              </label>
               <div className="flex items-center">
                 <div className="flex-shrink-0 h-10 w-10 bg-gray-200 rounded-full flex items-center justify-center mr-3">
                   {profilePic ? (
-                    <img 
-                      src={URL.createObjectURL(profilePic)} 
-                      alt="Profile preview" 
+                    <img
+                      src={URL.createObjectURL(profilePic)}
+                      alt="Profile preview"
                       className="h-10 w-10 rounded-full object-cover"
                     />
                   ) : (
@@ -294,32 +304,49 @@ export default function AuthForm({ type }) {
                   />
                 </label>
                 <span className="ml-2 text-sm text-gray-700">
-                  {profilePic ? profilePic.name : 'No file chosen'}
+                  {profilePic ? profilePic.name : "No file chosen"}
                 </span>
               </div>
             </div>
-            
+
             <div>
-                <label htmlFor={roleId} className="block text-gray-700 text-sm font-medium mb-2">I am a</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <div 
-                    className={`flex items-center justify-center p-3 border ${role === 'student' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'} rounded-lg cursor-pointer hover:bg-gray-50 transition-colors`}
-                    onClick={() => setRole('student')}
-                  >
-                  <FaUserGraduate className={`h-5 w-5 mr-2 ${role === 'student' ? 'text-blue-500' : 'text-gray-400'}`} />
-                  <span className={`${role === 'student' ? 'font-medium text-blue-700' : 'text-gray-700'}`}>Student</span>
-                </div>
-                <div 
-                  className={`flex items-center justify-center p-3 border ${role === 'teacher' ? 'border-blue-500 bg-blue-50' : 'border-gray-300'} rounded-lg cursor-pointer hover:bg-gray-50 transition-colors`}
-                  onClick={() => setRole('teacher')}
+              <label
+                htmlFor={roleId}
+                className="block text-gray-700 text-sm font-medium mb-2"
+              >
+                I am a
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <div
+                  className={`flex items-center justify-center p-3 border ${role === "student" ? "border-blue-500 bg-blue-50" : "border-gray-300"} rounded-lg cursor-pointer hover:bg-gray-50 transition-colors`}
+                  onClick={() => setRole("student")}
                 >
-                  <FaChalkboardTeacher className={`h-5 w-5 mr-2 ${role === 'teacher' ? 'text-blue-500' : 'text-gray-400'}`} />
-                  <span className={`${role === 'teacher' ? 'font-medium text-blue-700' : 'text-gray-700'}`}>Teacher</span>
+                  <FaUserGraduate
+                    className={`h-5 w-5 mr-2 ${role === "student" ? "text-blue-500" : "text-gray-400"}`}
+                  />
+                  <span
+                    className={`${role === "student" ? "font-medium text-blue-700" : "text-gray-700"}`}
+                  >
+                    Student
+                  </span>
+                </div>
+                <div
+                  className={`flex items-center justify-center p-3 border ${role === "teacher" ? "border-blue-500 bg-blue-50" : "border-gray-300"} rounded-lg cursor-pointer hover:bg-gray-50 transition-colors`}
+                  onClick={() => setRole("teacher")}
+                >
+                  <FaChalkboardTeacher
+                    className={`h-5 w-5 mr-2 ${role === "teacher" ? "text-blue-500" : "text-gray-400"}`}
+                  />
+                  <span
+                    className={`${role === "teacher" ? "font-medium text-blue-700" : "text-gray-700"}`}
+                  >
+                    Teacher
+                  </span>
                 </div>
               </div>
-              <select 
+              <select
                 id={roleId}
-                value={role} 
+                value={role}
                 onChange={(e) => setRole(e.target.value)}
                 className="sr-only"
                 suppressHydrationWarning
@@ -330,19 +357,27 @@ export default function AuthForm({ type }) {
             </div>
           </div>
         )}
-        
+
         <div className="pt-2">
           <button
             type="submit"
-            disabled={loading || (type === 'register' && (usernameAvailable === false || emailAvailable === false))}
-            className={`w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium transition-colors duration-200 transform shadow-md hover:shadow-lg ${(loading || (type === 'register' && (usernameAvailable === false || emailAvailable === false))) ? 'opacity-70 cursor-not-allowed' : ''}`}
+            disabled={
+              loading ||
+              (type === "register" &&
+                (usernameAvailable === false || emailAvailable === false))
+            }
+            className={`w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 font-medium transition-colors duration-200 transform shadow-md hover:shadow-lg ${loading || (type === "register" && (usernameAvailable === false || emailAvailable === false)) ? "opacity-70 cursor-not-allowed" : ""}`}
             suppressHydrationWarning
           >
-            {loading ? 'Processing...' : (type === 'login' ? 'Sign In' : 'Create Account')}
+            {loading
+              ? "Processing..."
+              : type === "login"
+                ? "Sign In"
+                : "Create Account"}
           </button>
         </div>
-        
-        {type === 'login' && (
+
+        {type === "login" && (
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center">
               <input
@@ -362,7 +397,7 @@ export default function AuthForm({ type }) {
           </div>
         )}
       </form>
-      
+
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300"></div>
@@ -371,27 +406,37 @@ export default function AuthForm({ type }) {
           <span className="px-2 bg-white text-gray-700">Or continue with</span>
         </div>
       </div>
-      
+
       <div>
-        <a 
-          href="/api/auth/google"
+        <a
+          href={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/google`}
           className="w-full flex items-center justify-center py-2.5 border border-gray-300 rounded-lg shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
         >
           <FaGoogle className="h-5 w-5 text-red-500 mr-2" />
-          Sign {type === 'login' ? 'in' : 'up'} with Google
+          Sign {type === "login" ? "in" : "up"} with Google
         </a>
       </div>
-      
+
       <div className="text-center text-sm text-gray-700">
-        {type === 'login' ? (
+        {type === "login" ? (
           <p>
-            Don&apos;t have an account?{' '}
-            <a href="/register" className="font-medium text-blue-700 hover:text-blue-600">Sign up</a>
+            Don&apos;t have an account?{" "}
+            <a
+              href="/register"
+              className="font-medium text-blue-700 hover:text-blue-600"
+            >
+              Sign up
+            </a>
           </p>
         ) : (
           <p>
-            Already have an account?{' '}
-            <a href="/login" className="font-medium text-blue-700 hover:text-blue-600">Sign in</a>
+            Already have an account?{" "}
+            <a
+              href="/login"
+              className="font-medium text-blue-700 hover:text-blue-600"
+            >
+              Sign in
+            </a>
           </p>
         )}
       </div>
