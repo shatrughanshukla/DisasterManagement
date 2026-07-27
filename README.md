@@ -1,6 +1,6 @@
-# 🌍 SafeEd – Disaster Management E-Learning Platform [SIH25008]
+# 🌍 readyScout – Disaster Management & Preparedness System
 
-SafeEd is a **gamified e-learning platform** designed to make disaster preparedness engaging and interactive for students.  
+readyScout is a **gamified e-learning platform** designed to make disaster preparedness engaging and interactive for students.  
 It combines **real-time alerts, AI-powered guidance, gamified drills, and school analytics** to help institutions stay prepared 🚨.
 
 ---
@@ -30,7 +30,7 @@ It combines **real-time alerts, AI-powered guidance, gamified drills, and school
 
 1. Clone the repo  
 ```bash
-git clone https://github.com/yourusername/SafeEd.git
+git clone https://github.com/yourusername/readyScout.git
 cd SafeEd
 ```
 2. Install frontend dependencies
