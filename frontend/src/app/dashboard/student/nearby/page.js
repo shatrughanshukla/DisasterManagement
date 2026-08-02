@@ -84,14 +84,21 @@ export default function NearbyPage() {
   const fetchPlaces = useCallback(async (loc) => {
     setLoadingPlaces(true);
     setFetchError(null);
-    try {
-      const query = buildOverpassQuery(loc.lat, loc.lon, 5000);
-      const res = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: 'data=' + encodeURIComponent(query),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
+    const query = buildOverpassQuery(loc.lat, loc.lon, 5000);
+    const endpoints = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter',
+    ];
+    let lastErr = null;
+    for (const endpoint of endpoints) {
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'data=' + encodeURIComponent(query),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
       const mapped = (json.elements || [])
         .map((el) => {
           let category = null;
@@ -111,12 +118,19 @@ export default function NearbyPage() {
         })
         .filter(Boolean)
         .sort((a, b) => a.distanceKm - b.distanceKm);
-      setPlaces(mapped);
-    } catch (err) {
-      setFetchError('Couldn\u2019t load nearby places right now. Try again in a moment.');
-    } finally {
-      setLoadingPlaces(false);
+        setPlaces(mapped);
+        setLoadingPlaces(false);
+        return; // success, stop trying further endpoints
+      } catch (err) {
+        lastErr = err;
+        console.warn(`Overpass endpoint failed (${endpoint}):`, err.message);
+        // try the next endpoint in the loop
+      }
     }
+    // all endpoints failed
+    console.error('All Overpass endpoints failed:', lastErr);
+    setFetchError('Couldn\u2019t load nearby places right now. Try again in a moment.');
+    setLoadingPlaces(false);
   }, []);
 
   useEffect(() => {
