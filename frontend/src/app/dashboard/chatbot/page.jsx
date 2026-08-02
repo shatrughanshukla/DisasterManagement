@@ -7,8 +7,8 @@ import { FaRobot } from 'react-icons/fa';
 import FormattedTime from '../../../components/FormattedTime';
 import { formatTime } from '../../../lib/dateUtils';
 
-// Replace this backend URL with an env var if you deploy / proxy it later
-const BACKEND_CHAT_URL = 'http://127.0.0.1:5001/chat';
+// Points to the deployed Flask service in production, falls back to local dev
+const BACKEND_CHAT_URL = `${process.env.NEXT_PUBLIC_FLASK_URL || 'http://127.0.0.1:5001'}/chat`;
 
 export default function Page() {
   return (
