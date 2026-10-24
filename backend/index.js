@@ -23,7 +23,9 @@ const PORT = process.env.PORT || 5000;
 // CORS middleware
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.FRONTEND_URL, // set this on Render to your Vercel URL, e.g. https://disastermanagement.vercel.app
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  process.env.FRONTEND_URL, // Set this to the deployed Vite site origin.
 ].filter(Boolean);
 
 app.use(cors({
@@ -36,7 +38,7 @@ app.use(cors({
 app.use(express.json());
 
 app.use(session({
-  secret: 'keyboard cat',
+  secret: process.env.SESSION_SECRET || 'local-development-session-secret-change-me',
   resave: false,
   saveUninitialized: false
 }));
@@ -45,17 +47,25 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/nearby', require('./routes/nearbyRoutes'));
+app.use('/api/alerts', require('./routes/alertRoutes'));
 
-app.get('/api/auth/google', passport.authenticate('google', {
-  scope: ['profile', 'email']
-}));
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  app.get('/api/auth/google', passport.authenticate('google', {
+    scope: ['profile', 'email']
+  }));
+} else {
+  app.get('/api/auth/google', (_req, res) => {
+    res.status(503).send('Google sign-in is not configured on this server.');
+  });
+}
 
-app.get(
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) app.get(
   "/api/auth/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
     const token = req.user.getSignedJwtToken();
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
     res.redirect(
       `${frontendUrl}/auth/success?token=${token}&userId=${req.user._id}`,
     );
@@ -68,8 +78,23 @@ app.use('/api/upload', require('./routes/uploadRoutes'));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Serve the Vite build from Express in production so the deployment needs one web service.
+const frontendDist = path.resolve(__dirname, '../frontend/dist');
+app.use(express.static(frontendDist));
+
 app.get('/', (req, res) => {
-  res.send('API is running...');
+  res.sendFile(path.join(frontendDist, 'index.html'), (error) => {
+    if (error) res.send('API is running...');
+  });
+});
+
+app.use((req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api/') && req.accepts('html')) {
+    return res.sendFile(path.join(frontendDist, 'index.html'), (error) => {
+      if (error) next();
+    });
+  }
+  next();
 });
 
 app.listen(PORT, () => {

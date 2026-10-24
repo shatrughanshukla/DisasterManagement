@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getAlertDetails, readableAlertTitle } from '../../lib/alertDetails';
 
 function severityColor(sev = '') {
   const k = String(sev).toLowerCase();
@@ -12,6 +13,7 @@ function severityColor(sev = '') {
 
 export default function AlertTicker() {
   const [items, setItems] = useState(null);
+  const [detailsById, setDetailsById] = useState({});
 
   useEffect(() => {
     let active = true;
@@ -28,6 +30,16 @@ export default function AlertTicker() {
     const iv = setInterval(load, 60000);
     return () => { active = false; clearInterval(iv); };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (!items?.length) return () => { active = false; };
+    Promise.all(items.map(async (item) => [item.identifier, await getAlertDetails(item)]))
+      .then((results) => {
+        if (active) setDetailsById(Object.fromEntries(results.filter(([id, details]) => id && details)));
+      });
+    return () => { active = false; };
+  }, [items]);
 
   const hasAlerts = items && items.length > 0;
   const feed = hasAlerts ? items : [{ title: 'No active alerts in your area', severity: 'clear' }];
@@ -65,8 +77,8 @@ export default function AlertTicker() {
                   style={{ background: severityColor(a.severity) }}
                   aria-hidden="true"
                 />
-                {a.title}
-                {a.location ? <span style={{ color: '#8FA8C4' }}>&nbsp;· {a.location}</span> : null}
+                {readableAlertTitle(a, detailsById[a.identifier])}
+                {!detailsById[a.identifier]?.headline && a.location ? <span style={{ color: '#8FA8C4' }}>&nbsp;· {a.location}</span> : null}
               </span>
             ))}
           </div>

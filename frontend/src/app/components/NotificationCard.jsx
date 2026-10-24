@@ -1,5 +1,6 @@
-import Link from 'next/link';
+import { Link } from 'react-router-dom';
 import FormattedTime from '../../components/FormattedTime';
+import { readableAlertTitle } from '../../lib/alertDetails';
 
 function severityClasses(sev = '') {
   const k = String(sev).toLowerCase();
@@ -10,7 +11,7 @@ function severityClasses(sev = '') {
   return 'bg-orange-100 text-orange-800 border-orange-200'; // default to Severe styling
 }
 
-export default function NotificationCard({ alert }) {
+export default function NotificationCard({ alert, details }) {
   const isExternal = alert.link && /^https?:\/\//i.test(alert.link);
 
   const internalHref =
@@ -31,7 +32,7 @@ export default function NotificationCard({ alert }) {
     }
     if (internalHref) {
       return (
-        <Link href={internalHref} className={base} prefetch>
+        <Link to={internalHref} className={base}>
           {children}
         </Link>
       );
@@ -45,7 +46,7 @@ export default function NotificationCard({ alert }) {
     <Wrapper>
       <div className="flex items-start justify-between gap-2">
         <strong className="font-semibold text-xs leading-5 text-gray-900 line-clamp-2">
-          {alert.title}
+          {readableAlertTitle(alert, details)}
         </strong>
         <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] border ${sevClass}`}>
           {alert.severity || 'Severe'}

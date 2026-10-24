@@ -1,6 +1,4 @@
 // src/lib/usgs.js
-import 'server-only';
-
 function severityFromMag(m) {
   if (m == null) return 'Unknown';
   if (m >= 7) return 'Extreme';
@@ -10,10 +8,10 @@ function severityFromMag(m) {
 }
 
 export async function getUsgsQuakes(limit = 3) {
-  const url = process.env.USGS_FEED_URL;
+  const url = import.meta.env.VITE_USGS_FEED_URL;
   if (!url) throw new Error('USGS_FEED_URL not set');
 
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`USGS feed failed: ${res.status}`);
   const json = await res.json(); // GeoJSON FeatureCollection
 
@@ -45,7 +43,7 @@ export async function getUsgsQuakeById(id) {
   // USGS provides a per-event GeoJSON detail; you can either use properties.detail
   // or query FDSN with eventid:
   const url = `https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&eventid=${encodeURIComponent(id)}`;
-  const res = await fetch(url, { next: { revalidate: 60 } });
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) return null;
   const f = await res.json(); // a GeoJSON Feature
   const p = f?.properties ?? {};

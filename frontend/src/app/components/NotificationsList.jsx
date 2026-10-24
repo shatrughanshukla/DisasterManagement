@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import NotificationCard from './NotificationCard';
+import { getAlertDetails } from '../../lib/alertDetails';
 
 export default function NotificationsList() {
   const [items, setItems] = useState(null);
   const [error, setError] = useState(null);
+  const [detailsById, setDetailsById] = useState({});
 
   useEffect(() => {
     let active = true;
@@ -24,6 +26,16 @@ export default function NotificationsList() {
     const iv = setInterval(load, 60000);
     return () => { active = false; clearInterval(iv); };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (!items?.length) return () => { active = false; };
+    Promise.all(items.map(async (item) => [item.identifier, await getAlertDetails(item)]))
+      .then((results) => {
+        if (active) setDetailsById(Object.fromEntries(results.filter(([id, details]) => id && details)));
+      });
+    return () => { active = false; };
+  }, [items]);
 
   if (error) return <p className="text-sm text-red-600">Error: {error}</p>;
 
@@ -48,7 +60,7 @@ export default function NotificationsList() {
       <div className="flex gap-3 flex-nowrap">
         {items.map(a => (
           <div key={a.uid || `${a.kind}-${a.id}`} className="w-72 flex-none">
-            <NotificationCard alert={a} />
+            <NotificationCard alert={a} details={detailsById[a.identifier]} />
           </div>
         ))}
       </div>

@@ -6,9 +6,10 @@ const CONFIG = {
   width: 900,
   height: 600,
   parent: "game-container",
+  scale: { mode: Phaser.Scale.FIT, autoCenter: Phaser.Scale.CENTER_BOTH },
   backgroundColor: "#87ceeb",
   physics: { default: "arcade", arcade: { gravity: { y: 400 }, debug: false } },
-  scene: [PreloadScene, MenuScene, PlayScene, ResultScene],
+  scene: [PreloadScene, PlayScene, ResultScene],
 };
 
 // Make sure the game variable is accessible globally
@@ -44,7 +45,7 @@ PreloadScene.prototype.preload = function () {
 PreloadScene.prototype.create = function () {
   // If real textures weren't loaded, generate placeholder textures (background, desk, student, book)
   this.createPlaceholderAssets();
-  this.scene.start("MenuScene");
+  this.scene.start("PlayScene");
 };
 
 PreloadScene.prototype.createPlaceholderAssets = function () {
@@ -144,20 +145,6 @@ PreloadScene.prototype.createPlaceholderAssets = function () {
   }
 };
 
-/* ------------------ MenuScene ------------------ */
-function MenuScene() {
-  Phaser.Scene.call(this, { key: "MenuScene" });
-}
-MenuScene.prototype = Object.create(Phaser.Scene.prototype);
-MenuScene.prototype.constructor = MenuScene;
-MenuScene.prototype.create = function () {
-  const startBtn = document.getElementById("start-btn");
-  const resultDiv = document.getElementById("result");
-  resultDiv.innerText = "";
-  startBtn.disabled = false;
-  // We don't set onclick here anymore as it's handled in the HTML file
-};
-
 /* ------------------ PlayScene ------------------ */
 function PlayScene() {
   Phaser.Scene.call(this, { key: "PlayScene" });
@@ -166,11 +153,6 @@ PlayScene.prototype = Object.create(Phaser.Scene.prototype);
 PlayScene.prototype.constructor = PlayScene;
 
 PlayScene.prototype.create = function () {
-  // DOM hooks
-  this.timerEl = document.getElementById("time-val");
-  this.resultEl = document.getElementById("result");
-  this.resultEl.innerText = "";
-
   // Background image (placeholder or real)
   this.add.image(450, 300, "classroom_bg").setDisplaySize(900, 600);
 
@@ -274,13 +256,19 @@ PlayScene.prototype.create = function () {
 
   // Timer
   this.timeRemaining = 15;
+  this.timerText = this.add.text(870, 52, "15s", {
+    fontSize: "20px",
+    fill: "#111827",
+    fontStyle: "bold",
+    backgroundColor: "#ffffff",
+    padding: { x: 8, y: 4 },
+  }).setOrigin(1, 0).setDepth(1003);
   this.timerEvent = this.time.addEvent({
     delay: 1000,
     callback: this.tick,
     callbackScope: this,
     loop: true,
   });
-  this.timerEl.innerText = this.timeRemaining;
 
   // Sound (optional)
   try {
@@ -448,7 +436,7 @@ PlayScene.prototype.tick = function () {
   if (this.gameEnded) return;
 
   this.timeRemaining -= 1;
-  if (this.timerEl) this.timerEl.innerText = this.timeRemaining;
+  if (this.timerText) this.timerText.setText(`${this.timeRemaining}s`);
   if (this.timeRemaining <= 0) {
     this.endRound();
   }
@@ -596,25 +584,25 @@ ResultScene.prototype.init = function (data) {
 };
 
 ResultScene.prototype.create = function () {
-  // Show result text in the UI area (re-uses HTML)
-  const startBtn = document.getElementById("start-btn");
-  const resultDiv = document.getElementById("result");
-  
-  // Set values in the registry for the enhanced UI to access
-  this.registry.set('result', this.result);
-  this.registry.set('health', this.finalHealth);
-
-  if (this.result === "safe") {
-    resultDiv.innerText = `SAFE ✅ — You followed Duck, Cover & Hold! Final Health: ${this.finalHealth}%`;
-    resultDiv.style.color = "lightgreen";
-  } else {
-    if (this.finalHealth <= 0) {
-      resultDiv.innerText = `INJURED ❌ — Your health reached zero! You should duck and hold under a desk to avoid falling debris.`;
-    } else {
-      resultDiv.innerText = `INJURED ❌ — You should duck and hold under a desk. Final Health: ${this.finalHealth}%`;
-    }
-    resultDiv.style.color = "salmon";
-  }
-
-  startBtn.disabled = false;
+  const title = this.result === "safe" ? "SAFE — WELL DONE!" : "DRILL OVER — TRY AGAIN";
+  const message = this.result === "safe"
+    ? "You followed Duck, Cover & Hold and stayed protected."
+    : "Take cover under a sturdy desk, duck, and hold on during shaking.";
+  this.add.rectangle(450, 300, 640, 240, 0x111827, 0.92)
+    .setStrokeStyle(2, this.result === "safe" ? 0x22c55e : 0xf97316);
+  this.add.text(450, 250, title, {
+    fontSize: "30px", color: this.result === "safe" ? "#86efac" : "#fdba74",
+    fontStyle: "bold", align: "center", wordWrap: { width: 560 },
+  }).setOrigin(0.5);
+  this.add.text(450, 305, `${message}\nFinal health: ${this.finalHealth}%`, {
+    fontSize: "18px", color: "#ffffff", align: "center", wordWrap: { width: 540 },
+    lineSpacing: 8,
+  }).setOrigin(0.5);
+  const replay = this.add.text(450, 380, "Play again", {
+    fontSize: "18px", color: "#ffffff", backgroundColor: "#4f46e5",
+    padding: { x: 18, y: 10 }, fontStyle: "bold",
+  }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+  replay.on("pointerdown", () => this.scene.start("PlayScene"));
+  replay.on("pointerover", () => replay.setBackgroundColor("#4338ca"));
+  replay.on("pointerout", () => replay.setBackgroundColor("#4f46e5"));
 };

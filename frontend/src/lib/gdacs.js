@@ -1,7 +1,5 @@
 // src/lib/gdacs.js
-import 'server-only';
 import { XMLParser } from 'fast-xml-parser';
-import crypto from 'crypto';
 
 const parser = new XMLParser({ ignoreAttributes: false, attributeNamePrefix: '' });
 
@@ -14,15 +12,19 @@ const sevFromTitle = (t='') => {
 };
 
 function shortId(str) {
-  return crypto.createHash('sha1').update(str).digest('hex').slice(0, 16);
+  let hash = 2166136261;
+  for (const char of String(str)) {
+    hash = Math.imul(hash ^ char.charCodeAt(0), 16777619);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
 }
 function asArray(x){ return Array.isArray(x) ? x : (x ? [x] : []); }
 
 export async function getGdacsFloods(limit = 3) {
-  const rssUrl = process.env.GDACS_FLOOD_RSS;
+  const rssUrl = import.meta.env.VITE_GDACS_FLOOD_RSS;
   if (!rssUrl) throw new Error('GDACS_FLOOD_RSS not set');
 
-  const res = await fetch(rssUrl, { next: { revalidate: 60 } });
+  const res = await fetch(rssUrl, { cache: 'no-store' });
   if (!res.ok) throw new Error(`GDACS RSS failed: ${res.status}`);
   const xml = await res.text();
   const json = parser.parse(xml);
